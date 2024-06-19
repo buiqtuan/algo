@@ -66,6 +66,24 @@ mod double_linked_list {
             }
         }
 
+        pub fn pop_front(&mut self) -> Option<T> {
+            unsafe {
+                return self.head.take().map(|old_head|{
+                    match (*old_head).next.take() {
+                        Some(new_head) => {
+                            (*new_head).prev.take();
+                            self.head = Some(new_head);
+                        },
+                        None => {
+                            self.tail.take();
+                        }
+                    }
+                    let old_head =  Box::from_raw(old_head);
+                    old_head.element
+                });
+            }
+        }
+
         pub fn pop_back(&mut self) -> Option<T> {
             unsafe {
                 self.tail.take().map(|old_tail| {
